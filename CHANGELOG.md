@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Clarify that post-win recovery is runtime-confirmed on no$psX 2.3
+- Keep long-term operation and save compatibility explicitly unresolved
+- Explain the required raw 2352-byte-sector BIN/CUE format
+- Document the confirmed patched BIN SHA-256
+
 ## v0.1.0-alpha
 
 - Initial experimental public release

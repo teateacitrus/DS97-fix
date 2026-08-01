@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Experimental GWIN.SOL-only cooperative patch for Derby Stallion 97 v1.1.
+"""Alpha GWIN.SOL-only cooperative patch for Derby Stallion 97 v1.1.
 
 This patch changes only DATA/WINNING/GWIN.SOL inside the disc image. Other overlays
 that reuse the same 0x800Fxxxx RAM addresses are not changed. Within GWIN.SOL it
@@ -13,11 +13,14 @@ is pending it tail-jumps to the existing service routine at 0x800F7024.  At
 the wait site, $ra is 0x800F7E30 (the return address from the immediately
 preceding JAL), so the service routine returns directly to the wait loop.
 
-This script is deliberately labelled experimental until the compact wrapper
-and guard are validated end-to-end in no$psx.  It never modifies the input in
-place, verifies the confirmed source image and all original bytes, preserves
-the 0xF0 comparison, regenerates Mode2/Form1 EDC/ECC, and checks that only the
-two intended sectors changed.
+Post-win recovery itself is runtime-confirmed on no$psX 2.3. The public tool
+remains alpha/experimental because long-term operation, existing-save
+compatibility, save/reload, repeated wins, and other emulators remain
+unresolved or unconfirmed.
+
+This script never modifies the input in place, verifies the confirmed source
+image and all original bytes, preserves the 0xF0 comparison, regenerates
+Mode2/Form1 EDC/ECC, and checks that only the two intended sectors changed.
 """
 
 from __future__ import annotations
@@ -411,7 +414,7 @@ def verify_patched(path: Path, expected_lbas: set[int]) -> None:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
-            "Create the experimental GWIN.SOL-only cooperative DS97 v1.1 patch "
+            "Create the alpha GWIN.SOL-only cooperative DS97 v1.1 patch "
             "while preserving the original 0xF0 completion threshold."
         )
     )
@@ -492,7 +495,9 @@ def main(argv: list[str]) -> int:
     print("Patched-sector EDC/ECC verification: OK")
     print(f"Patched SHA256: {sha256_file(output_bin)}")
     print(
-        "Runtime status: experimental; boot the patched image from power-on and validate the GWIN wrapper/guard through post-win F0 completion before release."
+        "Runtime status: post-win recovery confirmed on no$psX 2.3; "
+        "long-term operation, existing-save compatibility, save/reload, "
+        "repeated wins, and other emulators remain unconfirmed."
     )
     return 0
 

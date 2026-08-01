@@ -166,3 +166,15 @@ def test_existing_output_is_not_overwritten_by_default(tmp_path):
 
     with pytest.raises(FileExistsError):
         module.main(["--input-bin", str(input_bin), "--output-bin", str(output_bin)])
+
+
+def test_runtime_status_wording_matches_evidence_boundary():
+    module = load_patch_module()
+    source = SCRIPT.read_text(encoding="utf-8")
+
+    assert ("validated end-to-end in no" + "$psx") not in module.__doc__
+    assert ("Runtime status: " + "experimental") not in source
+    assert ("before " + "release") not in source
+    assert "alpha GWIN.SOL-only" in module.build_parser().description
+    assert "confirmed on no$psX 2.3" in source
+    assert "remain unconfirmed" in source
