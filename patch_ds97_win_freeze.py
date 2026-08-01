@@ -13,10 +13,10 @@ is pending it tail-jumps to the existing service routine at 0x800F7024.  At
 the wait site, $ra is 0x800F7E30 (the return address from the immediately
 preceding JAL), so the service routine returns directly to the wait loop.
 
-Post-win recovery itself is runtime-confirmed on no$psX 2.3. The public tool
-remains alpha/experimental because long-term operation, existing-save
-compatibility, save/reload, repeated wins, and other emulators remain
-unresolved or unconfirmed.
+Post-win recovery is runtime-confirmed on no$psX 2.3 and DuckStation.
+Existing-ranch loading and in-game saving with the correct basename-specific
+MCD, and repeated-win progression, are runtime-confirmed in the tested setup.
+Long-term operation remains unconfirmed.
 
 This script never modifies the input in place, verifies the confirmed source
 image and all original bytes, preserves the 0xF0 comparison, regenerates
@@ -495,9 +495,10 @@ def main(argv: list[str]) -> int:
     print("Patched-sector EDC/ECC verification: OK")
     print(f"Patched SHA256: {sha256_file(output_bin)}")
     print(
-        "Runtime status: post-win recovery confirmed on no$psX 2.3; "
-        "long-term operation, existing-save compatibility, save/reload, "
-        "repeated wins, and other emulators remain unconfirmed."
+        "Runtime status: post-win recovery confirmed on no$psX 2.3 and "
+        "DuckStation; existing-ranch load/save with the correct "
+        "basename-specific MCD and repeated-win progression are confirmed "
+        "in the tested setup. Long-term operation remains unconfirmed."
     )
     return 0
 

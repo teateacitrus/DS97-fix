@@ -2,10 +2,13 @@
 
 ## Evidence Boundary
 
-This document summarizes the runtime-confirmed cooperative GWIN patch recorded in `ds97_analysis` commit `0eeca1f`.
+This document summarizes the runtime-confirmed cooperative GWIN patch recorded in `ds97_analysis`.
 
 - Post-win freeze workaround: runtime-confirmed on no$psX 2.3
-- Long-term operation including existing saves: unresolved
+- Post-win freeze workaround: runtime-confirmed on DuckStation
+- Repeated-win progression: runtime-confirmed
+- Existing-ranch load/save with the correct no$psX basename-specific MCD: runtime-confirmed for the tested procedure
+- Long-term operation: unconfirmed
 - Public state: alpha / experimental
 
 No game image, extracted `GWIN.SOL`, BIOS, save, or binary patch payload is included.
@@ -67,6 +70,21 @@ The `0x800Fxxxx` RAM range is reused by multiple overlays. Unconditional RAM-add
 - Mode2/Form1 EDC/ECC: regenerated and verified
 - `800F7E3C` original `0xF0` threshold: preserved
 - Runtime result: `801C4BF0` advanced to `0xF0`, and victory screen returned to the ranch without stopping
+- DuckStation post-win recovery: runtime-confirmed
+- Repeated-win progression: runtime-confirmed
+- Existing-ranch load/save with the correct no$psX basename-specific MCD: runtime-confirmed for the tested procedure
+
+## Memory-card Assignment Investigation
+
+- no$psX may associate the first MCD with the CD image basename
+- Renaming the patched CUE/BIN can select or create a different MCD
+- The initially selected cooperative-image MCD did not match the known-good MCD
+- Copying the known-good MCD to the cooperative-image basename resolved the mismatch
+- Immediate save after loading succeeded
+- Save after post-win recovery succeeded
+- The failure was not reproduced with the correct MCD assignment
+- The result does not support cooperative-patch save incompatibility
+- Long-term operation remains unconfirmed
 
 ## Superseded F0 to CC Patch
 

@@ -8,6 +8,11 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "patch_ds97_win_freeze.py"
+README = ROOT / "README.md"
+CHANGELOG = ROOT / "CHANGELOG.md"
+TECHNICAL_DETAILS = ROOT / "docs" / "technical-details.md"
+TROUBLESHOOTING = ROOT / "docs" / "troubleshooting.md"
+VALIDATION_CHECKLIST = ROOT / "docs" / "validation-checklist.md"
 
 
 def load_patch_module():
@@ -177,4 +182,59 @@ def test_runtime_status_wording_matches_evidence_boundary():
     assert ("before " + "release") not in source
     assert "alpha GWIN.SOL-only" in module.build_parser().description
     assert "confirmed on no$psX 2.3" in source
-    assert "remain unconfirmed" in source
+    assert "DuckStation" in source
+    assert "basename-specific MCD" in source
+    assert "repeated-win progression" in source
+    assert "Long-term operation remains unconfirmed" in source
+    assert ("existing-" + "save " + "compatibility remains " + "unresolved") not in source
+    assert ("repeated wins remain " + "unconfirmed") not in source
+
+
+def test_public_docs_match_mcd_evidence_boundary():
+    readme = README.read_text(encoding="utf-8")
+    docs = "\n".join(
+        path.read_text(encoding="utf-8")
+        for path in [CHANGELOG, TECHNICAL_DETAILS, TROUBLESHOOTING, VALIDATION_CHECKLIST]
+    )
+    public_text = readme + "\n" + docs
+
+    assert "DuckStation" in public_text
+    assert "basename" in readme
+    assert "MCD" in readme
+    assert "複数回の勝利後も正常に進行する" in readme
+    assert "Long-term operation remains unconfirmed" in public_text
+    assert "長期運用は未確認" in public_text
+    assert "協調型パッチによる旧セーブ非互換を示す結果ではありません" in readme
+    assert "古いsavestateが保存失敗の原因だったとは断定していません" in readme
+    assert ("existing-" + "save " + "compatibility remains " + "unresolved") not in public_text
+    assert ("repeated wins remain " + "unconfirmed") not in public_text
+    assert "DuckStationでは未確認" not in public_text
+    assert "古いsavestateが保存失敗の原因です" not in public_text
+    assert "古いsavestateが保存失敗の原因でした" not in public_text
+
+
+def test_patch_constants_remain_unchanged():
+    module = load_patch_module()
+
+    assert module.SECTOR_SIZE == 2352
+    assert module.EXPECTED_BIN_SIZE == 405_917_568
+    assert module.EXPECTED_SHA256 == "92fc3d8bae259f4167a5b72ff9e6d849b3c3790dc50140557ca965c8270b080a"
+    assert module.GWIN_LBA == 151_556
+    assert module.GWIN_SIZE == 0x3AB78
+    assert module.OVERLAY_HEADER_FILE_OFFSET == 0x30B50
+    assert module.OVERLAY_PAYLOAD_FILE_OFFSET == 0x30B60
+    assert module.OVERLAY_LOAD_ADDRESS == 0x800F2AB8
+    assert module.WAIT_LOOP_ADDRESS == 0x800F7E30
+    assert module.WAIT_BRANCH_ADDRESS == 0x800F7E40
+    assert module.WAIT_BRANCH_FILE_OFFSET == 0x35EE8
+    assert module.SERVICE_ROUTINE_ADDRESS == 0x800F7024
+    assert module.PENDING_FLAG_ADDRESS == 0x801C7678
+    assert module.PATCH_REGION_ADDRESS == 0x800F8344
+    assert module.GUARD_ADDRESS == 0x800F8354
+    assert module.ORIGINAL_THRESHOLD == bytes.fromhex("F0 00 42 28")
+    assert module.PATCHED_WAIT_BRANCH == bytes.fromhex("44 01 40 14")
+    assert module.PATCH_REGION_BYTES == bytes.fromhex(
+        "21 28 80 00 10 80 04 3C 95 BA 01 08 00 C9 84 24 "
+        "1C 80 02 3C 78 76 42 8C 00 00 00 00 B3 FE 40 10 "
+        "00 00 00 00 09 DC 03 08 00 00 00 00"
+    )
