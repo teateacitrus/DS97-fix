@@ -1,10 +1,19 @@
 # DS97-fix
 
-『ダービースタリオン97』v1.1（SLPS-00777）で、一部のエミュレーター使用時にレース勝利後の処理が停止する現象を回避するための、検証版パッチ作成ツールです。
+『ダービースタリオン97』v1.1（SLPS-00777）用の、検証版パッチ作成ツールです。レース勝利後の停止を回避する協調型パッチと、その出力へ追加適用する競走馬パラメータ表示パッチを収録しています。
 
 このリポジトリは **alpha / experimental** です。ゲーム本体、BIOS、BIN、CUE、ROM、セーブデータ、差分パッチファイルは含みません。自分で所有するディスクから吸い出した raw 2352-byte-sector BIN/CUE が必要です。
 
-## 対象
+## 収録ツール
+
+| ツール | 用途 | 入力 |
+|---|---|---|
+| `patch_ds97_win_freeze.py` | 一部エミュレーターでの勝利後停止を回避 | 確認済み後期版v1.1 raw BIN/CUE |
+| `patch_ds97_parameter_display.py` | 競走馬画面へ内部パラメータ16個を表示 | 上記フリーズ回避パッチの確認済み出力BIN |
+
+パラメータ表示は任意です。フリーズ回避だけを使用することもできます。
+
+## フリーズ回避パッチの対象
 
 - 対象ゲーム: Derby Stallion 97 v1.1
 - ディスクID: `SLPS-00777`
@@ -49,7 +58,7 @@
 - 古いsavestateから起動せず、電源投入状態から起動してください。
 - 今回の正常動作確認では古いsavestateを使用していません。
 - 長期運用は未確認です。
-- 能力表示パッチは含みません。
+- パラメータ表示を追加する場合は、フリーズ回避版へ`patch_ds97_parameter_display.py`を二段階目として適用してください。
 
 ## no$psXで既存のメモリーカードを使用する場合
 
@@ -106,9 +115,46 @@ py -3 .\patch_ds97_win_freeze.py `
 
 詳細な確認欄は [validation-checklist.md](docs/validation-checklist.md) を使ってください。
 
+## 追加：競走馬パラメータ表示パッチ
+
+フリーズ回避版の競走馬画面へ、`record+0x18..+0x27`の16個の内部値を表示できます。本来の競走成績は維持されます。
+
+適用順:
+
+```text
+ダビスタ97 後期版 v1.1
+  ↓ patch_ds97_win_freeze.py
+DerbyStallion97_v11_fix.bin
+  ↓ patch_ds97_parameter_display.py
+DerbyStallion97_v11_fix_display.bin
+```
+
+二段階目が受け付ける入力:
+
+- サイズ: `405,917,568` bytes
+- SHA-256: `f3b56a1d00f95695bdad992128985e5e9135c9c681b716c8e0188916f2471f84`
+
+実行例:
+
+```powershell
+py -3 .\patch_ds97_parameter_display.py `
+  --input-bin ".\patched\DerbyStallion97_v11_fix.bin" `
+  --output-bin ".\patched\DerbyStallion97_v11_fix_display.bin"
+```
+
+出力CUEと監査JSONは、出力BINと同じ場所へ自動生成されます。確認済み出力BINのSHA-256は次です。
+
+```text
+fc66ceed0d09abbf73725321500eefc6486404d2bd01f90f5838bff9d5df484b
+```
+
+no$psX 2.3では、パラメータ表示、競走成績の維持、勝利後の正常進行、ゲーム内セーブ、cold boot後の再ロードを確認済みです。この追加パッチについて、DuckStationと長期運用は未確認です。
+
+入力BINの探し方、数値の対応、馬体重と成長型の読み方は [parameter-display.md](docs/parameter-display.md) を参照してください。変更箇所と検証境界は [parameter-display-technical-details.md](docs/parameter-display-technical-details.md) に記録しています。
+
 ## 既知の未確認事項
 
-長期運用については、まだ十分な確認を行っていません。
+フリーズ回避パッチ、パラメータ表示パッチともに、長期運用についてはまだ十分な確認を行っていません。
 
 トラブルシューティングは [troubleshooting.md](docs/troubleshooting.md) を参照してください。技術詳細は [technical-details.md](docs/technical-details.md) にまとめています。
 

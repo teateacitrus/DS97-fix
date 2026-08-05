@@ -4,6 +4,40 @@
 
 対象はSLPS-00777 v1.1の確認済みraw BINです。別バージョン、変換済みイメージ、吸い出し不良の可能性があります。デフォルトでは未確認SHA-256を拒否します。
 
+## パラメータ表示パッチで入力パスだけがERRORになる
+
+例えば次のように、`ERROR:`の後へ入力パスだけが表示される場合は、指定位置にBINが存在するか確認してください。
+
+```powershell
+Test-Path ".\patched\DerbyStallion97_v11_fix.bin"
+```
+
+`False`なら、実際の保存場所を検索します。
+
+```powershell
+Get-ChildItem . -Recurse -File -Filter "DerbyStallion97_v11_fix.bin" |
+  Select-Object FullName, Length
+```
+
+見つかった`FullName`を`--input-bin`へ指定してください。例えば入力が`original`フォルダにある場合は次のようにします。
+
+```powershell
+py -3 .\patch_ds97_parameter_display.py `
+  --input-bin ".\original\DerbyStallion97_v11_fix.bin" `
+  --output-bin ".\patched\DerbyStallion97_v11_fix_display.bin"
+```
+
+## パラメータ表示パッチで入力SHA-256が一致しない
+
+二段階目の入力は、確認済みオリジナルBINへ`patch_ds97_win_freeze.py`を適用した直後のBINです。
+
+```text
+size:    405,917,568 bytes
+SHA-256: f3b56a1d00f95695bdad992128985e5e9135c9c681b716c8e0188916f2471f84
+```
+
+元の後期版BIN、初期版BIN、開発途中の表示版、別パッチ適用済みBINは受け付けません。二段階目には未確認SHA-256を許可するオプションはありません。
+
 ## BINサイズが一致しない
 
 対応サイズは `405,917,568` bytes です。raw 2352-byte-sector BIN以外は対象外です。
@@ -58,6 +92,14 @@ PowerShellで `py -3 --version` を確認してください。見つからない
 ## 古いステートセーブから起動した
 
 古いsavestateにはパッチ前のRAM状態が残る可能性があります。電源投入状態から起動してください。
+
+## パラメータ表示が出ない、または表示が想定と違う
+
+- `DerbyStallion97_v11_fix_display.cue`から起動したか確認する
+- savestateではなくcold bootする
+- no$psX RAM code `800F8D3C 0018`を併用しない
+- 出力BIN SHA-256が`fc66ceed0d09abbf73725321500eefc6486404d2bd01f90f5838bff9d5df484b`か確認する
+- 100以上の値はゲーム本来の2桁表示で百の位が省略されることに注意する
 
 ## 出力ファイルがすでに存在する
 
